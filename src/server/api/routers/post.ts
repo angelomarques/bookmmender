@@ -16,4 +16,12 @@ export const postRouter = createTRPCRouter({
     .mutation(async ({ input }) => {
       console.log("input", input);
     }),
+
+  getLatest: publicProcedure.query(async ({ ctx }) => {
+    const prompt = await ctx.db.query.prompts.findFirst({
+      orderBy: (posts, { desc }) => [desc(posts.createdAt)],
+    });
+
+    return prompt ?? null;
+  }),
 });
