@@ -24,28 +24,21 @@ import { QuestionType } from "@/service/questions/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft } from "lucide-react";
 import { Control, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const FormSchema = z.object({
-  genre: z.array(z.string()).refine((value) => value.some((item) => item), {
-    message: "You have to select at least one item.",
-  }),
-  mood: z.array(z.string()).refine((value) => value.some((item) => item), {
-    message: "You have to select at least one item.",
-  }),
-  agePeriod: z.array(z.string()).refine((value) => value.some((item) => item), {
-    message: "You have to select at least one item.",
-  }),
-  bookLength: z
-    .array(z.string())
-    .refine((value) => value.some((item) => item), {
-      message: "You have to select at least one item.",
-    }),
+  genre: z.array(z.string()),
+  mood: z.array(z.string()),
+  agePeriod: z.array(z.string()),
+  bookLength: z.array(z.string()),
 });
 
 export function Questions() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+    mode: "onBlur", // Trigger validation on blur
+    reValidateMode: "onBlur", // Re-validate on blur
     defaultValues: {
       genre: [],
       mood: [],
@@ -55,6 +48,14 @@ export function Questions() {
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
+    const arraysValues = Object.values(data);
+    const isAllEmpty = arraysValues.every((array) => array.length === 0);
+
+    if (isAllEmpty) {
+      toast.error("Please answer at least one question");
+      return;
+    }
+
     console.log("data", data);
     alert("submitted");
   }
