@@ -99,7 +99,7 @@ function QuestionItem({
 }: QuestionItemProps) {
   return (
     <div>
-      <Card>
+      <Card className="h-[340px]">
         <CardContent>
           <FormField
             control={formControl}
@@ -159,16 +159,19 @@ function QuestionsCarouselButtons() {
   const isLastSlide = currentSlide + 1 === slidesCount;
 
   return (
-    <div className="flex justify-between w-full mt-5">
+    <div className="flex justify-between w-full mt-3">
       <Button type="button" variant="secondary" onClick={scrollPrev}>
         <ArrowLeft />
         <span>Back</span>
       </Button>
-      {isLastSlide ? (
+
+      {isLastSlide && (
         <Button type="submit">
           <span>Submit</span>
         </Button>
-      ) : (
+      )}
+
+      {!isLastSlide && (
         <Button type="button" onClick={scrollNext}>
           <span>Continue</span>
         </Button>
