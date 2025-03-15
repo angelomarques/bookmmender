@@ -21,6 +21,7 @@ import {
 import { Progress } from "@/components/ui/progress";
 import { questions } from "@/service/questions";
 import { QuestionType } from "@/service/questions/types";
+import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft } from "lucide-react";
 import { Control, useForm } from "react-hook-form";
@@ -47,6 +48,19 @@ export function Questions() {
     },
   });
 
+  const { mutate: createRecommendation } =
+    api.recommendation.create.useMutation({
+      onMutate: async () => {
+        toast.loading("Loading...", {
+          id: "create-recommendation-loading",
+        });
+      },
+      onSuccess: async () => {
+        toast.info("Recommendation created");
+        toast.dismiss("create-recommendation-loading");
+      },
+    });
+
   function onSubmit(data: z.infer<typeof FormSchema>) {
     const arraysValues = Object.values(data);
     const isAllEmpty = arraysValues.every((array) => array.length === 0);
@@ -57,7 +71,7 @@ export function Questions() {
     }
 
     console.log("data", data);
-    alert("submitted");
+    createRecommendation({ name: "heey" });
   }
 
   return (
