@@ -10,6 +10,13 @@ const nextConfig: NextConfig = {
         pathname: "**",
         search: "",
       },
+      {
+        protocol: "https",
+        hostname: "covers.openlibrary.org",
+        port: "",
+        pathname: "**",
+        search: "?default=false",
+      },
     ],
   },
 };
