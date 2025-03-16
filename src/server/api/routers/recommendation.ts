@@ -6,6 +6,7 @@ import {
   QuestionsSchemaType,
 } from "@/service/questions/schema";
 import { RecommendationsSchema } from "@/service/recommendations/schema";
+import { BookRecommendationType } from "@/service/recommendations/types";
 import { google } from "@ai-sdk/google";
 import { TRPCError } from "@trpc/server";
 import { generateObject } from "ai";
@@ -13,7 +14,7 @@ import { generateObject } from "ai";
 export const recommendationsRouter = createTRPCRouter({
   create: publicProcedure
     .input(QuestionsSchema)
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ ctx, input }): Promise<BookRecommendationType[]> => {
       const promptData = await ctx.db.query.prompts.findFirst({
         where: (prompts, { eq }) =>
           eq(prompts.id, Number(env.BOOK_RECOMMENDER_PROMPT)),
@@ -48,11 +49,15 @@ export const recommendationsRouter = createTRPCRouter({
 
       const books = response.object.data;
 
-      // TODO: implement it
-      // const covers = await Promise.all(
-      //   books.map((item) => getBook(item.title, item.author))
-      // );
+      const covers = await Promise.all(
+        books.map((item) => getBook(item.title, item.author))
+      );
 
-      return response;
+      const res: BookRecommendationType[] = books.map((item, index) => ({
+        ...item,
+        ...covers.at(index),
+      }));
+
+      return res;
     }),
 });

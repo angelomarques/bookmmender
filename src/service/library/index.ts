@@ -18,6 +18,7 @@ export const getBook = async (
       title,
       author,
       limit: 1,
+      fields: "cover_edition_key,key",
     },
   });
 

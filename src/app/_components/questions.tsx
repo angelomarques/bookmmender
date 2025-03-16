@@ -54,10 +54,7 @@ export function Questions() {
         toast.dismiss("create-recommendation-loading");
 
         // TODO: remove
-        console.log(
-          "data retrieved",
-          JSON.stringify(data.object.data, null, 2)
-        );
+        console.log("data retrieved", JSON.stringify(data, null, 2));
       },
     });
 
