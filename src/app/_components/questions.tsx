@@ -25,6 +25,7 @@ import {
   QuestionsSchemaType,
 } from "@/service/questions/schema";
 import { QuestionType } from "@/service/questions/types";
+import { useRecommendationsStore } from "@/store/recommendations";
 import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft } from "lucide-react";
@@ -41,6 +42,11 @@ export function Questions() {
       bookLength: [],
     },
   });
+  const setBooks = useRecommendationsStore((state) => state.setBooks);
+  const setStatus = useRecommendationsStore((state) => state.setStatus);
+  const status = useRecommendationsStore((state) => state.status);
+
+  const isFormHidden = ["loading", "completed"].includes(status);
 
   const { mutate: createRecommendation } =
     api.recommendation.create.useMutation({
@@ -48,13 +54,15 @@ export function Questions() {
         toast.loading("Loading...", {
           id: "create-recommendation-loading",
         });
+
+        setStatus("loading");
       },
       onSuccess: async (data) => {
         toast.info("Recommendation created");
         toast.dismiss("create-recommendation-loading");
 
-        // TODO: remove
-        console.log("data retrieved", JSON.stringify(data, null, 2));
+        setStatus("completed");
+        setBooks(data);
       },
     });
 
@@ -69,6 +77,8 @@ export function Questions() {
 
     createRecommendation(data);
   }
+
+  if (isFormHidden) return null;
 
   return (
     <Form {...form}>

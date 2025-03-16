@@ -1,12 +1,11 @@
 import { HydrateClient } from "@/trpc/server";
-import { Questions } from "./_components/questions";
+import { Recommender } from "./_components/recommender";
 
 export default async function Page() {
   return (
     <HydrateClient>
       <main className="px-5 py-8">
-        <Questions />
-        {/* <BooksList /> */}
+        <Recommender />
       </main>
     </HydrateClient>
   );

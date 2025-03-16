@@ -1,6 +1,10 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BookSchemaType } from "@/service/recommendations/schema";
+import { useRecommendationsStore } from "@/store/recommendations";
 import Image from "next/image";
 
 const list: BookSchemaType[] = [
@@ -28,6 +32,14 @@ const list: BookSchemaType[] = [
 ];
 
 export function BooksList() {
+  const status = useRecommendationsStore((state) => state.status);
+
+  const isListHidden = !["loading", "completed"].includes(status);
+
+  if (isListHidden) return null;
+
+  if (status === "loading") return <BooksListSkeleton />;
+
   return (
     <div>
       <div className="space-y-4">
@@ -65,6 +77,33 @@ export function BooksList() {
           </Card>
         ))}
       </div>
+    </div>
+  );
+}
+
+function BooksListSkeleton() {
+  return (
+    <div className="space-y-4">
+      {Array(3)
+        .fill(null)
+        .map((_, index) => (
+          <Card key={index}>
+            <CardContent>
+              <Skeleton className="w-full aspect-video rounded-md object-cover" />
+              <div className="mt-4">
+                <Skeleton className="w-full h-16" />
+              </div>
+
+              <div className="mt-4">
+                <Skeleton className="w-full h-32" />
+              </div>
+
+              <div className="mt-4 space-y-2">
+                <Skeleton className="w-full h-32" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
     </div>
   );
 }
