@@ -1,11 +1,50 @@
-import { z } from "zod";
-
+import { env } from "@/env";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import {
+  QuestionsSchema,
+  QuestionsSchemaType,
+} from "@/service/questions/schema";
+import { RecommendationsSchema } from "@/service/recommendations/schema";
+import { google } from "@ai-sdk/google";
+import { TRPCError } from "@trpc/server";
+import { generateObject } from "ai";
 
 export const recommendationsRouter = createTRPCRouter({
   create: publicProcedure
-    .input(z.object({ name: z.string().min(1) }))
-    .mutation(async ({ input }) => {
-      console.log("input", input);
+    .input(QuestionsSchema)
+    .mutation(async ({ ctx, input }) => {
+      const promptData = await ctx.db.query.prompts.findFirst({
+        where: (prompts, { eq }) =>
+          eq(prompts.id, Number(env.BOOK_RECOMMENDER_PROMPT)),
+      });
+
+      if (!promptData)
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An unexpected error occurred, please try again later.",
+          cause: "prompt data not found",
+        });
+
+      const prompt = promptData.content;
+
+      Object.entries(input).forEach(([key, value]) => {
+        const property = key as keyof QuestionsSchemaType;
+        const propertyReplacer = `{{${property}}}`;
+
+        if (!value.length) {
+          prompt.replace(propertyReplacer, "---");
+          return;
+        }
+
+        prompt.replace(propertyReplacer, value.join(", ") + ";");
+      });
+
+      const response = await generateObject({
+        prompt,
+        model: google("gemini-2.0-flash-001"),
+        schema: RecommendationsSchema,
+      });
+
+      return response;
     }),
 });

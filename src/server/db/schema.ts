@@ -22,8 +22,8 @@ export const prompts = createTable(
   "prompt",
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-    name: varchar("name", { length: 256 }),
-    content: varchar("content", { length: 2048 }),
+    name: varchar("name", { length: 256 }).notNull(),
+    content: varchar("content", { length: 2048 }).notNull(),
 
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)

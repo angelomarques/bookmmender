@@ -20,24 +20,20 @@ import {
 } from "@/components/ui/form";
 import { Progress } from "@/components/ui/progress";
 import { questions } from "@/service/questions";
+import {
+  QuestionsSchema,
+  QuestionsSchemaType,
+} from "@/service/questions/schema";
 import { QuestionType } from "@/service/questions/types";
 import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft } from "lucide-react";
 import { Control, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
-
-const FormSchema = z.object({
-  genre: z.array(z.string()),
-  mood: z.array(z.string()),
-  agePeriod: z.array(z.string()),
-  bookLength: z.array(z.string()),
-});
 
 export function Questions() {
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  const form = useForm<QuestionsSchemaType>({
+    resolver: zodResolver(QuestionsSchema),
     mode: "onBlur", // Trigger validation on blur
     reValidateMode: "onBlur", // Re-validate on blur
     defaultValues: {
@@ -55,13 +51,19 @@ export function Questions() {
           id: "create-recommendation-loading",
         });
       },
-      onSuccess: async () => {
+      onSuccess: async (data) => {
         toast.info("Recommendation created");
         toast.dismiss("create-recommendation-loading");
+
+        // TODO: remove
+        console.log(
+          "data retrieved",
+          JSON.stringify(data.object.data, null, 2)
+        );
       },
     });
 
-  function onSubmit(data: z.infer<typeof FormSchema>) {
+  function onSubmit(data: QuestionsSchemaType) {
     const arraysValues = Object.values(data);
     const isAllEmpty = arraysValues.every((array) => array.length === 0);
 
@@ -70,8 +72,7 @@ export function Questions() {
       return;
     }
 
-    console.log("data", data);
-    createRecommendation({ name: "heey" });
+    createRecommendation(data);
   }
 
   return (
@@ -102,7 +103,7 @@ export function Questions() {
 }
 
 interface QuestionItemProps extends QuestionType {
-  formControl: Control<z.infer<typeof FormSchema>>;
+  formControl: Control<QuestionsSchemaType>;
 }
 
 function QuestionItem({
