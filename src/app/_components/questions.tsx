@@ -34,8 +34,6 @@ import { toast } from "sonner";
 export function Questions() {
   const form = useForm<QuestionsSchemaType>({
     resolver: zodResolver(QuestionsSchema),
-    mode: "onBlur", // Trigger validation on blur
-    reValidateMode: "onBlur", // Re-validate on blur
     defaultValues: {
       genre: [],
       mood: [],

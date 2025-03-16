@@ -1,5 +1,6 @@
 import { env } from "@/env";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { getBook } from "@/service/library";
 import {
   QuestionsSchema,
   QuestionsSchemaType,
@@ -44,6 +45,13 @@ export const recommendationsRouter = createTRPCRouter({
         model: google("gemini-2.0-flash-001"),
         schema: RecommendationsSchema,
       });
+
+      const books = response.object.data;
+
+      // TODO: implement it
+      // const covers = await Promise.all(
+      //   books.map((item) => getBook(item.title, item.author))
+      // );
 
       return response;
     }),
