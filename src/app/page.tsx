@@ -1,5 +1,5 @@
 import { HydrateClient } from "@/trpc/server";
-import { Questions } from "./questions";
+import { BooksList } from "./_components/books-list";
 
 export default async function Page() {
   // const hello = await api.post.hello({ text: "from Ângelo" });
@@ -9,7 +9,8 @@ export default async function Page() {
   return (
     <HydrateClient>
       <main className="px-5 py-8">
-        <Questions />
+        {/* <Questions /> */}
+        <BooksList />
       </main>
     </HydrateClient>
   );
