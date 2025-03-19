@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { Card, CardAction, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRecommendationsStore } from "@/store/recommendations";
@@ -11,6 +11,13 @@ export function BooksList() {
   const books = useRecommendationsStore((state) => state.books);
 
   const isListHidden = !["loading", "completed"].includes(status);
+
+  function getSearchUrl(title: string, author: string) {
+    const searchQuery = encodeURIComponent(`${title} by ${author}`);
+    const googleSearchUrl = `https://www.google.com/search?q=${searchQuery}`;
+
+    return googleSearchUrl;
+  }
 
   if (isListHidden) return null;
 
@@ -52,7 +59,13 @@ export function BooksList() {
               </div>
 
               <CardAction className="mt-4">
-                <Button>Search on Google</Button>
+                <a
+                  href={getSearchUrl(item.title, item.author)}
+                  target="_blank"
+                  className={buttonVariants()}
+                >
+                  Search on Google
+                </a>
               </CardAction>
             </CardContent>
           </Card>

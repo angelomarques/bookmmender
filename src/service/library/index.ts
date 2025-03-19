@@ -26,6 +26,6 @@ export const getBook = async (
   const id = book?.cover_edition_key ?? book.key;
 
   return {
-    coverUrl: `${env.LIBRARY_API_BOOK_COVER_HOST_URL}/${id}.jpg?default=false`,
+    coverUrl: `${env.LIBRARY_API_BOOK_COVER_HOST_URL}/${id}-L.jpg?default=false`,
   };
 };
