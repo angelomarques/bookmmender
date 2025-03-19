@@ -82,13 +82,13 @@ export function Questions() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
         <Carousel
           opts={{
             align: "start",
             watchDrag: false,
           }}
-          className="w-full max-w-sm"
+          className="w-full max-w-lg mx-auto"
         >
           <QuestionsCarouselProgress />
 
