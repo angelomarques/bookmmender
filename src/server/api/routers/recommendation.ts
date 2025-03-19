@@ -27,18 +27,18 @@ export const recommendationsRouter = createTRPCRouter({
           cause: "prompt data not found",
         });
 
-      const prompt = promptData.content;
+      let prompt = promptData.content;
 
       Object.entries(input).forEach(([key, value]) => {
         const property = key as keyof QuestionsSchemaType;
         const propertyReplacer = `{{${property}}}`;
 
         if (!value.length) {
-          prompt.replace(propertyReplacer, "---");
+          prompt = prompt.replace(propertyReplacer, "---");
           return;
         }
 
-        prompt.replace(propertyReplacer, value.join(", ") + ";");
+        prompt = prompt.replace(propertyReplacer, value.join(", ") + ";");
       });
 
       const response = await generateObject({
