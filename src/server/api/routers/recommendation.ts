@@ -47,6 +47,16 @@ export const recommendationsRouter = createTRPCRouter({
         schema: RecommendationsSchema,
       });
 
+      // TODO: review
+      ctx.posthog.capture({
+        // TODO: get some kind of user id
+        distinctId: "test",
+        event: "bookmmender_recommendation_object_created",
+        properties: {
+          response,
+        },
+      });
+
       const books = response.object.data;
 
       const covers = await Promise.all(

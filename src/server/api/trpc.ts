@@ -10,6 +10,7 @@ import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { db } from "../db";
+import { PostHogClient } from "../posthog";
 
 /**
  * 1. CONTEXT
@@ -24,8 +25,11 @@ import { db } from "../db";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
+  const posthog = PostHogClient();
+
   return {
     db,
+    posthog,
     ...opts,
   };
 };
@@ -95,6 +99,14 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
   return result;
 });
 
+const loggerMiddleware = t.middleware(async ({ next, ctx }) => {
+  const result = await next();
+
+  await ctx.posthog.shutdown();
+
+  return result;
+});
+
 /**
  * Public (unauthenticated) procedure
  *
@@ -102,4 +114,6 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
  * guarantee that a user querying is authorized, but you can still access user session data if they
  * are logged in.
  */
-export const publicProcedure = t.procedure.use(timingMiddleware);
+export const publicProcedure = t.procedure
+  .use(timingMiddleware)
+  .use(loggerMiddleware);

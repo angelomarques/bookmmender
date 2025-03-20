@@ -5,10 +5,13 @@ import { Card, CardAction, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRecommendationsStore } from "@/store/recommendations";
 import Image from "next/image";
+import { usePostHog } from "posthog-js/react";
+import { useEffect } from "react";
 
 export function BooksList() {
   const status = useRecommendationsStore((state) => state.status);
   const books = useRecommendationsStore((state) => state.books);
+  const posthog = usePostHog();
 
   const isListHidden = !["loading", "completed"].includes(status);
 
@@ -18,6 +21,12 @@ export function BooksList() {
 
     return googleSearchUrl;
   }
+
+  // TODO: review
+  useEffect(() => {
+    if (status === "completed")
+      posthog.capture("bookmmender_books_list_rendered");
+  }, [status, posthog]);
 
   if (isListHidden) return null;
 
