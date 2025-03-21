@@ -49,8 +49,7 @@ export const recommendationsRouter = createTRPCRouter({
 
       // TODO: review
       ctx.posthog.capture({
-        // TODO: get some kind of user id
-        distinctId: "test",
+        distinctId: ctx.ip,
         event: "bookmmender_recommendation_object_created",
         properties: {
           response,

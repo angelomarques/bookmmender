@@ -26,10 +26,13 @@ import { PostHogClient } from "../posthog";
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   const posthog = PostHogClient();
+  const ip =
+    opts.headers.get("x-forwarded-for") || opts.headers.get("x-real-ip") || "";
 
   return {
     db,
     posthog,
+    ip,
     ...opts,
   };
 };
