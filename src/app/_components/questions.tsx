@@ -46,23 +46,12 @@ export function Questions() {
   const setStatus = useRecommendationsStore((state) => state.setStatus);
   const status = useRecommendationsStore((state) => state.status);
 
-  const isFormHidden = ["loading", "completed"].includes(status);
+  const isFormHidden = status !== "unset";
 
-  const { mutate: createRecommendation } =
+  const { mutateAsync: createRecommendation } =
     api.recommendation.create.useMutation({
       onMutate: async () => {
-        toast.loading("Loading...", {
-          id: "create-recommendation-loading",
-        });
-
         setStatus("loading");
-      },
-      onSuccess: async (data) => {
-        toast.info("Recommendation created");
-        toast.dismiss("create-recommendation-loading");
-
-        setStatus("completed");
-        setBooks(data);
       },
     });
 
@@ -75,7 +64,23 @@ export function Questions() {
       return;
     }
 
-    createRecommendation(data);
+    toast.promise(() => createRecommendation(data), {
+      success: (data) => {
+        setStatus("completed");
+        setBooks(data);
+
+        return "Recommendation created";
+      },
+      loading: (() => {
+        setStatus("loading");
+
+        return "Loading";
+      })(),
+      error: () => {
+        setStatus("failed");
+        return "An error ocurred. Please try again later";
+      },
+    });
   }
 
   if (isFormHidden) return null;
