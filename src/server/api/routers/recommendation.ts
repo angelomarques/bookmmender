@@ -29,11 +29,18 @@ export const recommendationsRouter = createTRPCRouter({
 
       let prompt = promptData.content;
 
-      Object.entries(input).forEach(([key, value]) => {
-        const property = key as keyof QuestionsSchemaType;
-        const propertyReplacer = `{{${property}}}`;
+      const inputKeys: (keyof QuestionsSchemaType)[] = [
+        "agePeriod",
+        "bookLength",
+        "genre",
+        "mood",
+      ];
 
-        if (!value.length) {
+      inputKeys.forEach((key) => {
+        const value = input[key];
+        const propertyReplacer = `{{${key}}}`;
+
+        if (!value?.length) {
           prompt = prompt.replace(propertyReplacer, "---");
           return;
         }
