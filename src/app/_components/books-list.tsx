@@ -1,8 +1,9 @@
 "use client";
 
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardAction, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { BookSchemaType } from "@/service/recommendations/schema";
 import { useRecommendationsStore } from "@/store/recommendations";
 import Image from "next/image";
 import { usePostHog } from "posthog-js/react";
@@ -14,13 +15,6 @@ export function BooksList() {
   const posthog = usePostHog();
 
   const isListHidden = !["loading", "completed"].includes(status);
-
-  function getSearchUrl(title: string, author: string) {
-    const searchQuery = encodeURIComponent(`${title} by ${author}`);
-    const googleSearchUrl = `https://www.google.com/search?q=${searchQuery}`;
-
-    return googleSearchUrl;
-  }
 
   // TODO: review
   useEffect(() => {
@@ -64,23 +58,21 @@ export function BooksList() {
                 </div>
 
                 <div className="mt-4 space-y-2">
-                  <h3 className="text-xl font-semibold">Why this book</h3>
+                  <h3 className="text-xl font-semibold">Why this book?</h3>
                   <p className="text-sm">{item.why}</p>
                 </div>
 
                 <CardAction className="mt-4">
-                  <a
-                    href={getSearchUrl(item.title, item.author)}
-                    target="_blank"
-                    className={buttonVariants()}
-                  >
-                    Search on Google
-                  </a>
+                  <SearchButton book={item} />
                 </CardAction>
               </div>
             </CardContent>
           </Card>
         ))}
+
+        <div className="flex justify-center">
+          <Button>Load more</Button>
+        </div>
       </div>
     </div>
   );
@@ -104,5 +96,30 @@ function BooksListSkeleton() {
           </Card>
         ))}
     </div>
+  );
+}
+
+interface SearchButtonProps {
+  book: BookSchemaType;
+}
+
+function SearchButton({ book }: SearchButtonProps) {
+  function getSearchUrl(title: string, author: string) {
+    const searchQuery = encodeURIComponent(`${title} by ${author}`);
+    const googleSearchUrl = `https://www.google.com/search?q=${searchQuery}`;
+
+    return googleSearchUrl;
+  }
+
+  return (
+    <a
+      href={getSearchUrl(book.title, book.author)}
+      target="_blank"
+      className={buttonVariants({
+        variant: "secondary",
+      })}
+    >
+      Search on Google
+    </a>
   );
 }
