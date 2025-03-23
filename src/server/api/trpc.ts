@@ -9,7 +9,6 @@
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { db } from "../db";
 import { PostHogClient } from "../posthog";
 
 /**
@@ -30,7 +29,7 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
     opts.headers.get("x-forwarded-for") || opts.headers.get("x-real-ip") || "";
 
   return {
-    db,
+    // db,
     posthog,
     ip,
     ...opts,

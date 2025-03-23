@@ -11,6 +11,7 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    BOOK_RECOMMENDER_PROMPT_ID: z.string(),
     BOOK_RECOMMENDER_PROMPT: z.string(),
     LIBRARY_API_URL: z.string().url(),
     LIBRARY_API_USER_AGENT: z.string(),
@@ -36,6 +37,7 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     NODE_ENV: process.env.NODE_ENV,
     BOOK_RECOMMENDER_PROMPT: process.env.BOOK_RECOMMENDER_PROMPT,
+    BOOK_RECOMMENDER_PROMPT_ID: process.env.BOOK_RECOMMENDER_PROMPT_ID,
     LIBRARY_API_URL: process.env.LIBRARY_API_URL,
     LIBRARY_API_USER_AGENT: process.env.LIBRARY_API_USER_AGENT,
     LIBRARY_API_BOOK_COVER_HOST_URL:

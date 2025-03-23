@@ -22,19 +22,7 @@ export const recommendationsRouter = createTRPCRouter({
             "You have reached the maximum number of recommendations for this preference. Cannot load more.",
         });
 
-      const promptData = await ctx.db.query.prompts.findFirst({
-        where: (prompts, { eq }) =>
-          eq(prompts.id, Number(env.BOOK_RECOMMENDER_PROMPT)),
-      });
-
-      if (!promptData)
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "An unexpected error occurred, please try again later.",
-          cause: "prompt data not found",
-        });
-
-      let prompt = promptData.content;
+      let prompt = env.BOOK_RECOMMENDER_PROMPT;
 
       const questionKeys: (keyof QuestionsSchemaType)[] = [
         "agePeriod",
