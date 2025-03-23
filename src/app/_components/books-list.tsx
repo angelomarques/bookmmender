@@ -34,48 +34,50 @@ export function BooksList() {
 
   return (
     <div>
-      <div className="space-y-4">
+      <div className="space-y-4 max-w-4xl mt-4">
         {books.map((item) => (
           <Card key={item.title}>
-            <CardContent>
+            <CardContent className="md:flex gap-5 h-auto">
               {item.coverUrl ? (
                 <Image
                   width={300}
                   height={200}
                   src={item.coverUrl}
                   alt={`Cover of "${item.title}"`}
-                  className="w-full aspect-[1/1.75] rounded-md object-cover"
+                  className="w-full md:w-64 aspect-[1/1.75] md:aspect-auto rounded-md object-cover"
                 />
               ) : (
                 "No image"
               )}
 
-              <div className="mt-4">
-                <h2 className="text-3xl font-semibold">{item.title}</h2>
-                <p className="text-sm text-slate-300 mt-2">
-                  Book by {item.author}
-                </p>
-              </div>
+              <div className="flex-1">
+                <div className="mt-4 md:mt-0">
+                  <h2 className="text-3xl font-semibold">{item.title}</h2>
+                  <p className="text-sm text-slate-300 mt-2">
+                    Book by {item.author}
+                  </p>
+                </div>
 
-              <div className="mt-4 space-y-2">
-                <h3 className="text-xl font-semibold">Synopsis</h3>
-                <p className="text-sm">{item.synopsis}</p>
-              </div>
+                <div className="mt-4 space-y-2">
+                  <h3 className="text-xl font-semibold">Synopsis</h3>
+                  <p className="text-sm">{item.synopsis}</p>
+                </div>
 
-              <div className="mt-4 space-y-2">
-                <h3 className="text-xl font-semibold">Why this book</h3>
-                <p className="text-sm">{item.why}</p>
-              </div>
+                <div className="mt-4 space-y-2">
+                  <h3 className="text-xl font-semibold">Why this book</h3>
+                  <p className="text-sm">{item.why}</p>
+                </div>
 
-              <CardAction className="mt-4">
-                <a
-                  href={getSearchUrl(item.title, item.author)}
-                  target="_blank"
-                  className={buttonVariants()}
-                >
-                  Search on Google
-                </a>
-              </CardAction>
+                <CardAction className="mt-4">
+                  <a
+                    href={getSearchUrl(item.title, item.author)}
+                    target="_blank"
+                    className={buttonVariants()}
+                  >
+                    Search on Google
+                  </a>
+                </CardAction>
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -86,15 +88,17 @@ export function BooksList() {
 
 function BooksListSkeleton() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full max-w-4xl">
       {Array(3)
         .fill(null)
         .map((_, index) => (
           <Card key={index}>
             <CardContent>
-              <Skeleton className="w-full aspect-video rounded-md object-cover" />
-              <div className="mt-4">
-                <Skeleton className="w-full h-64" />
+              <div className="md:flex gap-5 h-80">
+                <Skeleton className="w-full md:w-64 aspect-video md:aspect-auto rounded-md object-cover" />
+                <div className="mt-4 md:mt-0 flex-1/2">
+                  <Skeleton className="w-full h-64 md:h-full" />
+                </div>
               </div>
             </CardContent>
           </Card>
