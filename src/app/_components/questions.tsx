@@ -44,16 +44,13 @@ export function Questions() {
   });
   const setBooks = useRecommendationsStore((state) => state.setBooks);
   const setStatus = useRecommendationsStore((state) => state.setStatus);
+  const setQuestions = useRecommendationsStore((state) => state.setQuestions);
   const status = useRecommendationsStore((state) => state.status);
 
   const isFormHidden = status !== "unset";
 
   const { mutateAsync: createRecommendation } =
-    api.recommendation.create.useMutation({
-      onMutate: async () => {
-        setStatus("loading");
-      },
-    });
+    api.recommendation.create.useMutation();
 
   function onSubmit(data: QuestionsSchemaType) {
     const arraysValues = Object.values(data);
@@ -64,7 +61,9 @@ export function Questions() {
       return;
     }
 
-    toast.promise(() => createRecommendation(data), {
+    setQuestions(data);
+
+    toast.promise(() => createRecommendation({ questions: data }), {
       success: (data) => {
         setStatus("completed");
         setBooks(data);

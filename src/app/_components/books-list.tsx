@@ -5,9 +5,11 @@ import { Card, CardAction, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BookSchemaType } from "@/service/recommendations/schema";
 import { useRecommendationsStore } from "@/store/recommendations";
+import { api } from "@/trpc/react";
 import Image from "next/image";
 import { usePostHog } from "posthog-js/react";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 export function BooksList() {
   const status = useRecommendationsStore((state) => state.status);
@@ -15,6 +17,7 @@ export function BooksList() {
   const posthog = usePostHog();
 
   const isListHidden = !["loading", "completed"].includes(status);
+  const isLoading = status === "loading";
 
   // TODO: review
   useEffect(() => {
@@ -24,67 +27,61 @@ export function BooksList() {
 
   if (isListHidden) return null;
 
-  if (status === "loading") return <BooksListSkeleton />;
-
   return (
-    <div>
-      <div className="space-y-4 max-w-4xl mt-4">
-        {books.map((item) => (
-          <Card key={item.title}>
-            <CardContent className="md:flex gap-5 h-auto">
-              {item.coverUrl ? (
-                <Image
-                  width={300}
-                  height={200}
-                  src={item.coverUrl}
-                  alt={`Cover of "${item.title}"`}
-                  className="w-full md:w-64 aspect-[1/1.75] md:aspect-auto rounded-md object-cover"
-                />
-              ) : (
-                "No image"
-              )}
+    <div className="space-y-4 max-w-4xl mt-4 w-full">
+      {books.map((item) => (
+        <Card key={item.title}>
+          <CardContent className="md:flex gap-5 h-auto">
+            {item.coverUrl ? (
+              <Image
+                width={300}
+                height={200}
+                src={item.coverUrl}
+                alt={`Cover of "${item.title}"`}
+                className="w-full md:w-64 aspect-[1/1.75] md:aspect-auto rounded-md object-cover"
+              />
+            ) : (
+              "No image"
+            )}
 
-              <div className="flex-1">
-                <div className="mt-4 md:mt-0">
-                  <h2 className="text-3xl font-semibold">{item.title}</h2>
-                  <p className="text-sm text-slate-300 mt-2">
-                    Book by {item.author}
-                  </p>
-                </div>
-
-                <div className="mt-4 space-y-2">
-                  <h3 className="text-xl font-semibold">Synopsis</h3>
-                  <p className="text-sm">{item.synopsis}</p>
-                </div>
-
-                <div className="mt-4 space-y-2">
-                  <h3 className="text-xl font-semibold">Why this book?</h3>
-                  <p className="text-sm">{item.why}</p>
-                </div>
-
-                <CardAction className="mt-4">
-                  <SearchButton book={item} />
-                </CardAction>
+            <div className="flex-1">
+              <div className="mt-4 md:mt-0">
+                <h2 className="text-3xl font-semibold">{item.title}</h2>
+                <p className="text-sm text-slate-300 mt-2">
+                  Book by {item.author}
+                </p>
               </div>
-            </CardContent>
-          </Card>
-        ))}
 
-        <div className="flex justify-center">
-          <Button>Load more</Button>
-        </div>
-      </div>
+              <div className="mt-4 space-y-2">
+                <h3 className="text-xl font-semibold">Synopsis</h3>
+                <p className="text-sm">{item.synopsis}</p>
+              </div>
+
+              <div className="mt-4 space-y-2">
+                <h3 className="text-xl font-semibold">Why this book?</h3>
+                <p className="text-sm">{item.why}</p>
+              </div>
+
+              <CardAction className="mt-4">
+                <SearchButton book={item} />
+              </CardAction>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+
+      {isLoading ? <BooksListSkeleton /> : <LoadMoreButton />}
     </div>
   );
 }
 
 function BooksListSkeleton() {
   return (
-    <div className="space-y-4 w-full max-w-4xl">
+    <>
       {Array(3)
         .fill(null)
         .map((_, index) => (
-          <Card key={index}>
+          <Card key={index} className="w-full">
             <CardContent>
               <div className="md:flex gap-5 h-80">
                 <Skeleton className="w-full md:w-64 aspect-video md:aspect-auto rounded-md object-cover" />
@@ -95,7 +92,7 @@ function BooksListSkeleton() {
             </CardContent>
           </Card>
         ))}
-    </div>
+    </>
   );
 }
 
@@ -121,5 +118,53 @@ function SearchButton({ book }: SearchButtonProps) {
     >
       Search on Google
     </a>
+  );
+}
+
+function LoadMoreButton() {
+  const setStatus = useRecommendationsStore((state) => state.setStatus);
+  const setBooks = useRecommendationsStore((state) => state.setBooks);
+  const questions = useRecommendationsStore((state) => state.questions);
+  const previousBooks = useRecommendationsStore((state) => state.books);
+
+  const { mutateAsync: createRecommendation } =
+    api.recommendation.create.useMutation();
+
+  function handleLoadMore() {
+    if (!questions) return toast.error("There's not questions set");
+
+    toast.promise(
+      () =>
+        createRecommendation({
+          questions,
+          previousList: previousBooks.map((item) => ({
+            title: item.title,
+            author: item.author,
+          })),
+        }),
+      {
+        success: (data) => {
+          setStatus("completed");
+          setBooks([...previousBooks, ...data]);
+
+          return "Recommendation created";
+        },
+        loading: (() => {
+          setStatus("loading");
+
+          return "Loading";
+        })(),
+        error: () => {
+          setStatus("failed");
+          return "An error ocurred. Please try again later";
+        },
+      }
+    );
+  }
+
+  return (
+    <div className="flex justify-center">
+      <Button onClick={handleLoadMore}>Load more</Button>
+    </div>
   );
 }
