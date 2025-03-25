@@ -9,7 +9,6 @@
 import { initTRPC } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
-import { PostHogClient } from "../posthog";
 
 /**
  * 1. CONTEXT
@@ -25,29 +24,9 @@ import { PostHogClient } from "../posthog";
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   // TODO: review
-  const posthog = PostHogClient();
+  // const posthog = PostHogClient();
   const ip =
     opts.headers.get("x-forwarded-for") || opts.headers.get("x-real-ip") || "";
-
-  // TODO: just for debugging, remove later
-  posthog.capture({
-    distinctId: ip,
-    event: "bookmmender_forwarded_ip",
-    properties: {
-      forwardedIp: opts.headers.get("x-forwarded-for"),
-    },
-  });
-
-  // TODO: just for debugging, remove later
-  posthog.capture({
-    distinctId: ip,
-    event: "bookmmender_real_ip",
-    properties: {
-      forwardedIp: opts.headers.get("x-real-ip"),
-    },
-  });
-
-  await posthog.shutdown();
 
   return {
     // db,
