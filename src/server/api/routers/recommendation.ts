@@ -15,7 +15,7 @@ export const recommendationsRouter = createTRPCRouter({
   create: publicProcedure
     .input(CreateRecommendationSchema)
     .mutation(async ({ ctx, input }): Promise<BookRecommendationType[]> => {
-      if ((input?.previousList?.length ?? 0) > 15)
+      if ((input?.previousList?.length ?? 0) >= 15)
         throw new TRPCError({
           code: "BAD_REQUEST",
           message:

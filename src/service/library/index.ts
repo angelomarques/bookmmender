@@ -23,6 +23,13 @@ export const getBook = async (
   });
 
   const book = data.docs[0];
+
+  if (!book) {
+    return {
+      coverUrl: undefined,
+    };
+  }
+
   const id = book?.cover_edition_key ?? book.key;
 
   return {

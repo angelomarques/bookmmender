@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BookSchemaType } from "@/service/recommendations/schema";
 import { useRecommendationsStore } from "@/store/recommendations";
 import { api } from "@/trpc/react";
+import { TRPCClientError } from "@trpc/client";
 import Image from "next/image";
 import { usePostHog } from "posthog-js/react";
 import { useEffect } from "react";
@@ -154,8 +155,13 @@ function LoadMoreButton() {
 
           return "Loading";
         })(),
-        error: () => {
-          setStatus("failed");
+        error: (error) => {
+          setStatus("completed");
+
+          if (error instanceof TRPCClientError) {
+            return error.message;
+          }
+
           return "An error ocurred. Please try again later";
         },
       }
