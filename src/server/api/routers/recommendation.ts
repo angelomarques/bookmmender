@@ -1,5 +1,6 @@
 import { env } from "@/env";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
+import { PostHogClient } from "@/server/posthog";
 import { getBook } from "@/service/library";
 import { QuestionsSchemaType } from "@/service/questions/schema";
 import {
@@ -22,6 +23,7 @@ export const recommendationsRouter = createTRPCRouter({
             "You have reached the maximum number of recommendations for this preference. Cannot load more.",
         });
 
+      const posthog = PostHogClient();
       let prompt = env.BOOK_RECOMMENDER_PROMPT;
 
       const questionKeys: (keyof QuestionsSchemaType)[] = [
@@ -65,7 +67,7 @@ export const recommendationsRouter = createTRPCRouter({
       });
 
       // TODO: review
-      ctx.posthog.capture({
+      posthog.capture({
         distinctId: ctx.ip,
         event: "bookmmender_recommendation_object_created",
         properties: {
@@ -83,6 +85,8 @@ export const recommendationsRouter = createTRPCRouter({
         ...item,
         ...covers.at(index),
       }));
+
+      await posthog.shutdown();
 
       return res;
     }),
