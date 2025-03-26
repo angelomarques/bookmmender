@@ -7,6 +7,7 @@
  * need to use are documented accordingly near the end.
  */
 import { initTRPC } from "@trpc/server";
+import { ipAddress } from "@vercel/functions";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
@@ -25,8 +26,7 @@ import { ZodError } from "zod";
 export const createTRPCContext = async (opts: { headers: Headers }) => {
   // TODO: review
   // const posthog = PostHogClient();
-  const ip =
-    opts.headers.get("x-forwarded-for") || opts.headers.get("x-real-ip") || "";
+  const ip = ipAddress(opts.headers) ?? "::ffff:127.0.0.1";
 
   return {
     // db,
