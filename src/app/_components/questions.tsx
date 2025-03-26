@@ -28,6 +28,7 @@ import { QuestionType } from "@/service/questions/types";
 import { useRecommendationsStore } from "@/store/recommendations";
 import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { TRPCClientError } from "@trpc/client";
 import { ArrowLeft } from "lucide-react";
 import { Control, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -75,8 +76,13 @@ export function Questions() {
 
         return "Loading";
       })(),
-      error: () => {
+      error: (error) => {
         setStatus("failed");
+
+        if (error instanceof TRPCClientError) {
+          return error.message;
+        }
+
         return "An error ocurred. Please try again later";
       },
     });

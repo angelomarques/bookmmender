@@ -1,6 +1,7 @@
 import { env } from "@/env";
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc";
 import { PostHogClient } from "@/server/posthog";
+import { ratelimit } from "@/server/ratelimit";
 import { getBook } from "@/service/library";
 import { QuestionsSchemaType } from "@/service/questions/schema";
 import {
@@ -16,6 +17,26 @@ export const recommendationsRouter = createTRPCRouter({
   create: publicProcedure
     .input(CreateRecommendationSchema)
     .mutation(async ({ ctx, input }): Promise<BookRecommendationType[]> => {
+      const { success, reset } = await ratelimit.limit(ctx.ip);
+
+      if (!success) {
+        const date = new Date(reset);
+
+        // Format: "March 26, 8:30 PM"
+        const formattedDate = date.toLocaleString("en-US", {
+          month: "long", // Full month name (e.g., "March")
+          day: "numeric", // Day of the month (e.g., "26")
+          hour: "numeric", // Hour (12-hour format)
+          minute: "2-digit", // Minute (e.g., "05")
+          hour12: true, // Use AM/PM
+        });
+
+        throw new TRPCError({
+          code: "TOO_MANY_REQUESTS",
+          message: `You’ve reached your recommendation limit for now. Try again at ${formattedDate}`,
+        });
+      }
+
       if ((input?.previousList?.length ?? 0) >= 15)
         throw new TRPCError({
           code: "BAD_REQUEST",
