@@ -83,7 +83,7 @@ export const recommendationsRouter = createTRPCRouter({
 
       const response = await generateObject({
         prompt,
-        model: google("gemini-2.0-flash-001"),
+        model: google("gemini-2.0-flash-lite-preview-02-05"),
         schema: RecommendationsSchema,
       });
 
