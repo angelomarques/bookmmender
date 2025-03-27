@@ -1,7 +1,7 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
-export const rateLimitRate = 10;
+export const rateLimitRate = 5;
 export const rateLimitTimeInMinutes = 5;
 
 const redis = Redis.fromEnv();
