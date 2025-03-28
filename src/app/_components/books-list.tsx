@@ -84,7 +84,7 @@ function BooksListSkeleton() {
         .map((_, index) => (
           <Card key={index} className="w-full">
             <CardContent>
-              <div className="md:flex gap-5 h-80">
+              <div className="md:flex gap-5 h-auto md:h-80">
                 <Skeleton className="w-full md:w-64 aspect-video md:aspect-auto rounded-md object-cover" />
                 <div className="mt-4 md:mt-0 flex-1/2">
                   <Skeleton className="w-full h-64 md:h-full" />
