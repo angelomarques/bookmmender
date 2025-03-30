@@ -20,20 +20,9 @@ export const recommendationsRouter = createTRPCRouter({
       const { success, reset } = await ratelimit.limit(ctx.ip);
 
       if (!success) {
-        const date = new Date(reset);
-
-        // Format: "March 26, 8:30 PM"
-        const formattedDate = date.toLocaleString("en-US", {
-          month: "long", // Full month name (e.g., "March")
-          day: "numeric", // Day of the month (e.g., "26")
-          hour: "numeric", // Hour (12-hour format)
-          minute: "2-digit", // Minute (e.g., "05")
-          hour12: true, // Use AM/PM
-        });
-
         throw new TRPCError({
           code: "TOO_MANY_REQUESTS",
-          message: `You’ve reached your recommendation limit for now. Try again at ${formattedDate}`,
+          message: `${reset}`,
         });
       }
 
