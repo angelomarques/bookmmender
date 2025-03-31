@@ -4,6 +4,7 @@ import { type NextRequest } from "next/server";
 import { env } from "@/env";
 import { appRouter } from "@/server/api/root";
 import { createTRPCContext } from "@/server/api/trpc";
+import { PostHogClient } from "@/server/posthog";
 
 /**
  * This wraps the `createTRPCContext` helper and provides the required context for the tRPC API when
@@ -23,12 +24,30 @@ const handler = (req: NextRequest) =>
     createContext: () => createContext(req),
     onError:
       env.NODE_ENV === "development"
-        ? ({ path, error }) => {
+        ? async ({ path, error, ctx }) => {
+            const posthog = PostHogClient();
+
+            posthog.captureException(error, ctx?.ip, {
+              message: error.message,
+              path,
+            });
+
+            await posthog.shutdown();
+
             console.error(
               `❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`
             );
           }
-        : undefined,
+        : async ({ error, ctx, path }) => {
+            const posthog = PostHogClient();
+
+            posthog.captureException(error, ctx?.ip, {
+              message: error.message,
+              path,
+            });
+
+            await posthog.shutdown();
+          },
   });
 
 export { handler as GET, handler as POST };
