@@ -6,7 +6,7 @@ import { Questions } from "./_components/questions";
 export default async function Page() {
   return (
     <HydrateClient>
-      <main className="px-5 py-8">
+      <main className="px-5">
         <div className="max-w-6xl mx-auto h-full flex items-center justify-center">
           <Questions />
 

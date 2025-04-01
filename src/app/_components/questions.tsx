@@ -111,7 +111,10 @@ export function Questions() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="w-full h-screen py-8 flex flex-col justify-center"
+      >
         <Carousel
           opts={{
             align: "start",

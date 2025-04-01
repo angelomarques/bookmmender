@@ -29,7 +29,7 @@ export function BooksList() {
   if (isListHidden) return null;
 
   return (
-    <div className="space-y-4 max-w-4xl mt-4 w-full">
+    <div className="space-y-4 max-w-4xl mt-4 w-full py-8">
       {books.map((item) => (
         <Card key={item.title}>
           <CardContent className="md:flex gap-5 h-auto">
