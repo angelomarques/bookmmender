@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Progress } from "@/components/ui/progress";
+import { getErrorMessage } from "@/lib/utils";
 import { questions } from "@/service/questions";
 import {
   QuestionsSchema,
@@ -28,7 +29,6 @@ import { QuestionType } from "@/service/questions/types";
 import { useRecommendationsStore } from "@/store/recommendations";
 import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { TRPCClientError } from "@trpc/client";
 import { ArrowLeft } from "lucide-react";
 import { Control, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -46,6 +46,9 @@ export function Questions() {
   const setBooks = useRecommendationsStore((state) => state.setBooks);
   const setStatus = useRecommendationsStore((state) => state.setStatus);
   const setQuestions = useRecommendationsStore((state) => state.setQuestions);
+  const setErrorMessage = useRecommendationsStore(
+    (state) => state.setErrorMessage
+  );
   const status = useRecommendationsStore((state) => state.status);
 
   const isFormHidden = status !== "unset";
@@ -78,31 +81,10 @@ export function Questions() {
       })(),
       error: (error) => {
         setStatus("failed");
+        const errorMessage = getErrorMessage(error);
 
-        if (error instanceof TRPCClientError) {
-          const resetTime = Number(error.message)
-            ? Number(error.message)
-            : null;
-
-          if (resetTime) {
-            const date = new Date(resetTime);
-
-            // Format: "March 26, 8:30 PM"
-            const formattedDate = date.toLocaleString("en-US", {
-              month: "long", // Full month name (e.g., "March")
-              day: "numeric", // Day of the month (e.g., "26")
-              hour: "numeric", // Hour (12-hour format)
-              minute: "2-digit", // Minute (e.g., "05")
-              hour12: true, // Use AM/PM
-            });
-
-            return `You’ve reached your recommendation limit for now. Try again at ${formattedDate}`;
-          }
-
-          return error.message;
-        }
-
-        return "An error ocurred. Please try again later";
+        setErrorMessage(errorMessage);
+        return errorMessage;
       },
     });
   }

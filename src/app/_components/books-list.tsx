@@ -3,10 +3,10 @@
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardAction, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getErrorMessage } from "@/lib/utils";
 import { BookSchemaType } from "@/service/recommendations/schema";
 import { useRecommendationsStore } from "@/store/recommendations";
 import { api } from "@/trpc/react";
-import { TRPCClientError } from "@trpc/client";
 import Image from "next/image";
 import { usePostHog } from "posthog-js/react";
 import { useEffect } from "react";
@@ -125,6 +125,9 @@ function SearchButton({ book }: SearchButtonProps) {
 function LoadMoreButton() {
   const setStatus = useRecommendationsStore((state) => state.setStatus);
   const setBooks = useRecommendationsStore((state) => state.setBooks);
+  const setErrorMessage = useRecommendationsStore(
+    (state) => state.setErrorMessage
+  );
   const questions = useRecommendationsStore((state) => state.questions);
   const previousBooks = useRecommendationsStore((state) => state.books);
 
@@ -157,31 +160,10 @@ function LoadMoreButton() {
         })(),
         error: (error) => {
           setStatus("completed");
+          const errorMessage = getErrorMessage(error);
 
-          if (error instanceof TRPCClientError) {
-            const resetTime = Number(error.message)
-              ? Number(error.message)
-              : null;
-
-            if (resetTime) {
-              const date = new Date(resetTime);
-
-              // Format: "March 26, 8:30 PM"
-              const formattedDate = date.toLocaleString("en-US", {
-                month: "long", // Full month name (e.g., "March")
-                day: "numeric", // Day of the month (e.g., "26")
-                hour: "numeric", // Hour (12-hour format)
-                minute: "2-digit", // Minute (e.g., "05")
-                hour12: true, // Use AM/PM
-              });
-
-              return `You’ve reached your recommendation limit for now. Try again at ${formattedDate}`;
-            }
-
-            return error.message;
-          }
-
-          return "An error ocurred. Please try again later";
+          setErrorMessage(errorMessage);
+          return errorMessage;
         },
       }
     );

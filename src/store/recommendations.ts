@@ -11,6 +11,8 @@ interface RecommendationsState {
   status: StatusType;
   setStatus: (newStatus: StatusType) => void;
   setQuestions: (newQuestions: QuestionsSchemaType) => void;
+  errorMessage?: string;
+  setErrorMessage: (message: string) => void;
 }
 
 export const useRecommendationsStore = create<RecommendationsState>()(
@@ -22,5 +24,7 @@ export const useRecommendationsStore = create<RecommendationsState>()(
     setStatus: (newStatus) => set((state) => ({ ...state, status: newStatus })),
     setQuestions: (newQuestions) =>
       set((state) => ({ ...state, questions: newQuestions })),
+    setErrorMessage: (message) =>
+      set((state) => ({ ...state, errorMessage: message })),
   })
 );
