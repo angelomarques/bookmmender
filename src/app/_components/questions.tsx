@@ -30,6 +30,7 @@ import { useRecommendationsStore } from "@/store/recommendations";
 import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft } from "lucide-react";
+import { useEffect } from "react";
 import { Control, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -55,6 +56,12 @@ export function Questions() {
 
   const { mutateAsync: createRecommendation } =
     api.recommendation.create.useMutation();
+
+  useEffect(() => {
+    if (status === "unset") {
+      form.reset();
+    }
+  }, [status]);
 
   function onSubmit(data: QuestionsSchemaType) {
     const arraysValues = Object.values(data);

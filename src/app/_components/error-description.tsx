@@ -1,10 +1,19 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { getErrorMessage } from "@/lib/utils";
 import { useRecommendationsStore } from "@/store/recommendations";
+import { api } from "@/trpc/react";
+import { toast } from "sonner";
 
 export function ErrorDescription() {
   const setStatus = useRecommendationsStore((state) => state.setStatus);
+  const setQuestions = useRecommendationsStore((state) => state.setQuestions);
+  const setBooks = useRecommendationsStore((state) => state.setBooks);
+  const setErrorMessage = useRecommendationsStore(
+    (state) => state.setErrorMessage
+  );
+  const questions = useRecommendationsStore((state) => state.questions);
   const errorMessage =
     useRecommendationsStore((state) => state.errorMessage) ??
     "An error ocurred. Please try again later";
@@ -12,7 +21,37 @@ export function ErrorDescription() {
   const isErrorHidden = status !== "failed";
 
   function resetAnswers() {
+    setQuestions(null);
     setStatus("unset");
+    setErrorMessage("");
+  }
+
+  const { mutateAsync: createRecommendation } =
+    api.recommendation.create.useMutation();
+
+  function retry() {
+    if (!questions) return toast.error("No questions answered yet");
+
+    toast.promise(() => createRecommendation({ questions }), {
+      success: (data) => {
+        setStatus("completed");
+        setBooks(data);
+
+        return "Recommendation created";
+      },
+      loading: (() => {
+        setStatus("loading");
+
+        return "Loading";
+      })(),
+      error: (error) => {
+        setStatus("failed");
+        const errorMessage = getErrorMessage(error);
+
+        setErrorMessage(errorMessage);
+        return errorMessage;
+      },
+    });
   }
 
   if (isErrorHidden) return null;
@@ -28,7 +67,7 @@ export function ErrorDescription() {
           Give new Answers
         </Button>
 
-        <Button>Retry</Button>
+        <Button onClick={retry}>Retry</Button>
       </div>
     </div>
   );

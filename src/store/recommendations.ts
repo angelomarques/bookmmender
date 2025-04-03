@@ -10,7 +10,7 @@ interface RecommendationsState {
   setBooks: (newBooks: BookRecommendationType[]) => void;
   status: StatusType;
   setStatus: (newStatus: StatusType) => void;
-  setQuestions: (newQuestions: QuestionsSchemaType) => void;
+  setQuestions: (newQuestions: QuestionsSchemaType | null) => void;
   errorMessage?: string;
   setErrorMessage: (message: string) => void;
 }
