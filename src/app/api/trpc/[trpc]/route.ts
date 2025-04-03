@@ -22,32 +22,21 @@ const handler = (req: NextRequest) =>
     req,
     router: appRouter,
     createContext: () => createContext(req),
-    onError:
-      env.NODE_ENV === "development"
-        ? async ({ path, error, ctx }) => {
-            const posthog = PostHogClient();
+    onError: async ({ path, error, ctx }) => {
+      const posthog = PostHogClient();
 
-            posthog.captureException(error, ctx?.ip, {
-              message: error.message,
-              path,
-            });
+      posthog.captureException(error, ctx?.ip, {
+        message: error.message,
+        path,
+      });
 
-            await posthog.shutdown();
+      await posthog.shutdown();
 
-            console.error(
-              `❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`
-            );
-          }
-        : async ({ error, ctx, path }) => {
-            const posthog = PostHogClient();
-
-            posthog.captureException(error, ctx?.ip, {
-              message: error.message,
-              path,
-            });
-
-            await posthog.shutdown();
-          },
+      if (env.NODE_ENV === "development")
+        console.error(
+          `❌ tRPC failed on ${path ?? "<no-path>"}: ${error.message}`
+        );
+    },
   });
 
 export { handler as GET, handler as POST };
