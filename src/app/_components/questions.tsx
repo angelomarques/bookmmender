@@ -30,6 +30,7 @@ import { useRecommendationsStore } from "@/store/recommendations";
 import { api } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft } from "lucide-react";
+import { usePostHog } from "posthog-js/react";
 import { useEffect } from "react";
 import { Control, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -52,6 +53,8 @@ export function Questions() {
   );
   const status = useRecommendationsStore((state) => state.status);
 
+  const posthog = usePostHog();
+
   const isFormHidden = status !== "unset";
 
   const { mutateAsync: createRecommendation } =
@@ -61,7 +64,11 @@ export function Questions() {
     if (status === "unset") {
       form.reset();
     }
-  }, [status]);
+  }, [status, form]);
+
+  useEffect(() => {
+    posthog.capture("bookmmender_page_visited");
+  }, []);
 
   function onSubmit(data: QuestionsSchemaType) {
     const arraysValues = Object.values(data);
