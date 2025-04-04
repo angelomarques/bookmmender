@@ -2,6 +2,7 @@ import { HydrateClient } from "@/trpc/server";
 import { BooksList } from "./_components/books-list";
 import { ErrorDescription } from "./_components/error-description";
 import { Questions } from "./_components/questions";
+import { AnalyticsPageView } from "@/components/pageview";
 
 export default async function Page() {
   return (
@@ -13,6 +14,8 @@ export default async function Page() {
           <BooksList />
 
           <ErrorDescription />
+
+          <AnalyticsPageView />
         </div>
       </main>
     </HydrateClient>
