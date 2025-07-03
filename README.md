@@ -232,9 +232,9 @@ The application is deployed on **Vercel** with the following features:
 4. Add tests if applicable
 5. Submit a pull request
 
-## 📄 License
+<!-- ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License. -->
 
 ---
 
