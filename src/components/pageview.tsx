@@ -18,6 +18,7 @@ export function AnalyticsPageView() {
       }
       posthog.capture("$pageview", {
         $current_url: url,
+        // TODO: not working
         project: "bookmmender",
       });
     }
